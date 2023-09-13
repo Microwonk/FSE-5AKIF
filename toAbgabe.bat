@@ -28,5 +28,6 @@ for %%F in ("%folder_path%\*") do (
 powershell Compress-Archive -Path "!temp_folder!\*" -DestinationPath "aufgabe.zip" -Force
 
 echo Zip file created: "aufgabe.zip"
+rmdir /s /q "!temp_folder!"
 pause
 exit /b
