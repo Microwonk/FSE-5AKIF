@@ -7,11 +7,7 @@ public final class Namensschilderdruck implements Druckbar {
             case Mitarbeiter m -> {
                 System.out.println(
                         m.getUID() + "  " + m.getName() + '\n' +
-                                switch (m.getPosition()) {
-                                    case Abteilungsleiter -> "***";
-                                    case CEO -> "*****";
-                                    case Mitarbeiter -> "*";
-                                }
+                                m.getPosition().sternchen()
                 );
             }
         }

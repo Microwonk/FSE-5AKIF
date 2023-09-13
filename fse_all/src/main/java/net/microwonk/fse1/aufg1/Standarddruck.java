@@ -9,7 +9,7 @@ public final class Standarddruck implements Druckbar{
         switch (person) {
             case Mitarbeiter m -> {
                 System.out.println(
-                        m.getUID() + "  " + m.getName() +
+                        m.getUID() + "  " + m.getName() + " " +
                             m.getEMail() + "    " + m.getPosition().toString()
                 );
             }

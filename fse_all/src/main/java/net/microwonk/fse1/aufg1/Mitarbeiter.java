@@ -30,9 +30,27 @@ public final class Mitarbeiter extends Person {
         this.position = position;
     }
 
+    // eine Enumeration für die Einteilung eines Mitarbeiters
     public enum Position {
-        Abteilungsleiter,
-        CEO,
-        Mitarbeiter; // usw, mit fällt nicht mehr ein
+        Abteilungsleiter {
+            @Override
+            String sternchen() {
+                return "***";
+            }
+        },
+        CEO {
+            @Override
+            String sternchen() {
+                return "*****";
+            }
+        },
+        Mitarbeiter {
+            @Override
+            String sternchen() {
+                return "*";
+            }
+        };
+        // abstrakte Methode in einem Enum muss bei jedem "Case" implementiert werden -> gibt die sternchen zurück die in @Namensschilderdruck.drucken(Person person) in Verwendung kommt
+        abstract String sternchen();
     }
 }
