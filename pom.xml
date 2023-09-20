@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>fse_all</module>
-        <module>testing-stuff</module>
     </modules>
 
     <properties>
