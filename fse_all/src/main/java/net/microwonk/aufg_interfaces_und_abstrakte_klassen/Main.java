@@ -1,4 +1,4 @@
-package net.microwonk.aufg;
+package net.microwonk.aufg_interfaces_und_abstrakte_klassen;
 
 public class Main {
     public static void main(String[] args) {
