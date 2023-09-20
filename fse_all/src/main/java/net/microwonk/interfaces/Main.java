@@ -1,4 +1,4 @@
-package net.microwonk.fse1.interfaces;
+package net.microwonk.interfaces;
 
 import java.util.ArrayList;
 import java.util.Arrays;

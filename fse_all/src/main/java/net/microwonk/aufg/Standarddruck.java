@@ -1,6 +1,4 @@
-package net.microwonk.fse1.aufg1;
-
-import java.lang.reflect.Field;
+package net.microwonk.aufg;
 
 public final class Standarddruck implements Druckbar{
     @Override

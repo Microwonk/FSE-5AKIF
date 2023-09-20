@@ -1,4 +1,4 @@
-package net.microwonk.fse1.aufg1;
+package net.microwonk.aufg;
 
 public class Visitenkartendruck {
 

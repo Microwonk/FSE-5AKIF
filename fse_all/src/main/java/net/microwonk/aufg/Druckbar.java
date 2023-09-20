@@ -1,4 +1,4 @@
-package net.microwonk.fse1.aufg1;
+package net.microwonk.aufg;
 
 // ein sealed interface muss eine Reihe von Klassen oder Interfaces permitten
 // , damit Pattern matching ohne default case und andere Sachen möglich sind.
