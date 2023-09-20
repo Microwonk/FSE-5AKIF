@@ -5,6 +5,8 @@ public final class Mitarbeiter extends Person {
     private String EMail;
     private Position position;
 
+    // TODO verbesserung!! set in Konstruktor
+
     public Mitarbeiter(String name, long UID, String EMail, Position position) {
         super(name, UID);
         if (!EMail.matches("^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$"))

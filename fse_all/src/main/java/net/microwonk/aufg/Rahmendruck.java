@@ -11,8 +11,8 @@ public final class Rahmendruck implements  Druckbar {
                 int len = Math.max(f.length(), s.length()); // maximale Länge von beiden Zeilen
 
                 // padding
-                String padF = " ".repeat(Math.max(0, len - f.length()));
-                String padS = " ".repeat(Math.max(0, len - s.length()));
+                String padF = " ".repeat(len - f.length());
+                String padS = " ".repeat(len - s.length());
                 len+=2; // Add 2 for padding
 
                 // print
