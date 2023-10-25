@@ -3,6 +3,7 @@ package net.microwonk.microarchitecture.observer;
 import java.util.ArrayList;
 import java.util.List;
 
+// macht hier auf jeden Fall sinn, da ein Chat nichts bringt, wenn keiner zuhören kann
 public class ChatSubject implements Subject {
 
     private final List<Observer> observers;
@@ -33,7 +34,7 @@ public class ChatSubject implements Subject {
     public record Chat(String person, String message) {
         @Override
         public String toString() {
-            return person + " sagt: " + message;
+            return person + ": " + message;
         }
     }
 }

@@ -9,36 +9,69 @@ import net.microwonk.microarchitecture.chainOfResonsibility.WRHandler;
 import net.microwonk.microarchitecture.decorator.FixGebuhrenDecorator;
 import net.microwonk.microarchitecture.decorator.ProzentGebuhrenDecorator;
 import net.microwonk.microarchitecture.observer.ChatSubject;
+import net.microwonk.microarchitecture.observer.Chatter;
 import net.microwonk.microarchitecture.observer.LogObserver;
+import net.microwonk.microarchitecture.strategy.CreditCardStrategy;
+import net.microwonk.microarchitecture.strategy.Item;
+import net.microwonk.microarchitecture.strategy.PaypalStrategy;
+import net.microwonk.microarchitecture.strategy.ShoppingCart;
 
 import java.util.Arrays;
 
-import static net.microwonk.microarchitecture.builder.Person.people;
-
-public class Main {
+public class Test {
     public static void main(String[] args) {
 
-        //testChainOfResponsibility();
+        testChainOfResponsibility();
         System.out.println("\n");
 
-        //testDecorator();
+        testDecorator();
         System.out.println("\n");
 
-        //testBuilder();
+        testBuilder();
         System.out.println("\n");
 
-        //testAdapter();
+        testAdapter();
         System.out.println("\n");
 
-        testObserver();
+        try {
+            testObserver();
+        } catch (Exception ignored) {}
+
+        testStrategy();
     }
 
-    private static void testObserver() {
+    private static void testStrategy() {
+        ShoppingCart cart = new ShoppingCart();
+
+        Item item1 = new Item("1234",10);
+        Item item2 = new Item("5678",40);
+
+        cart.addItem(item1);
+        cart.addItem(item2);
+
+        cart.pay(new PaypalStrategy("myemail@example.com", "mypwd"));
+
+        cart.pay(new CreditCardStrategy("Pankaj Kumar", "1234567890123456", "786", "12/15"));
+    }
+
+    private static void testObserver() throws Exception {
         ChatSubject cs = new ChatSubject();
         LogObserver lo = new LogObserver("test.txt");
         cs.addObserver(lo);
 
-        cs.sendChat(new ChatSubject.Chat("Nicolas", "Hallo ich bin Nicolas!"));
+        var c1 = new Chatter("Nicolas");
+        var c2 = new Chatter("Hannah");
+        var c3 = new Chatter("Matthias");
+
+        cs.addObserver(c1);
+        cs.addObserver(c2);
+        cs.addObserver(c3);
+
+        c1.sendChatFrom(cs, "Hallo");
+        Thread.sleep(1000);
+        c2.sendChatFrom(cs, "Hallo");
+        Thread.sleep(1500);
+        c3.sendChatFrom(cs, "Tschüss");
     }
 
     private static void testAdapter() {

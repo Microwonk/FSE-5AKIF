@@ -1,4 +1,15 @@
-Nicolas sagt: Hallo ich bin Nicolas!
-Nicolas sagt: Hallo ich bin Nicolas!
-Nicolas sagt: Hallo ich bin Nicolas!
-Nicolas sagt: Hallo ich bin Nicolas!
+Tue Oct 17 13:48:23 CEST 2023 | Nicolas: Hallo
+Tue Oct 17 13:48:23 CEST 2023 | Hannah: Hallo
+Tue Oct 17 13:48:23 CEST 2023 | Matthias: Tschüss
+Tue Oct 17 13:50:22 CEST 2023 | Nicolas: Hallo
+Tue Oct 17 13:50:22 CEST 2023 | Hannah: Hallo
+Tue Oct 17 13:50:22 CEST 2023 | Matthias: Tschüss
+Tue Oct 17 13:51:21 CEST 2023 | Nicolas: Hallo
+Tue Oct 17 13:51:22 CEST 2023 | Hannah: Hallo
+Tue Oct 17 13:51:22 CEST 2023 | Matthias: Tschüss
+Tue Oct 17 13:51:39 CEST 2023 | Nicolas: Hallo
+Tue Oct 17 13:51:40 CEST 2023 | Hannah: Hallo
+Tue Oct 17 13:51:41 CEST 2023 | Matthias: Tschüss
+Wed Oct 18 07:59:56 CEST 2023 | Nicolas: Hallo
+Wed Oct 18 07:59:57 CEST 2023 | Hannah: Hallo
+Wed Oct 18 07:59:59 CEST 2023 | Matthias: Tschüss

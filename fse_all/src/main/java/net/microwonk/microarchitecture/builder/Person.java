@@ -4,6 +4,7 @@ import net.microwonk.microarchitecture.WR;
 
 import java.util.*;
 
+
 public class Person {
 
     private int age;
@@ -54,6 +55,7 @@ public class Person {
 
     public final static Map<String, Person> people = new HashMap<>();
 
+    // Das Builder-Muster ist bei dieser Klasse sehr hilfreich, da man einige Datenfelder (und die people-Liste) populaten muss.
     public static class Builder {
         private Person person;
 
@@ -62,6 +64,7 @@ public class Person {
         }
 
         public Builder reset() {
+            // YAGNI: Das Zurücksetzen eines Person-Objekts ist möglicherweise nicht notwendig und könnte entfernt werden, wenn nicht benötigt.
             this.person = new Person();
             return this;
         }
@@ -97,6 +100,8 @@ public class Person {
         public Builder addFriendGroupFrom(String firstName, String lastName) {
             var friend = people.get(firstName + lastName);
             if (friend == null) return this;
+            // DRY: Der Code zum Hinzufügen von Freunden und Aktualisieren der Freunde von beiden Personen ist hier wiederholt.
+            // Dies könnte in eine separate Methode ausgelagert werden, um die Redundanz zu reduzieren.
             friend.friends.forEach(f -> addFriend(f.name, f.lastName));
             return addFriend(lastName, firstName);
         }

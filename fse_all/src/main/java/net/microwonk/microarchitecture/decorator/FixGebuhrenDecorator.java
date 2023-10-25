@@ -8,6 +8,7 @@ public class FixGebuhrenDecorator extends WRDecorator {
         super(umrechner);
     }
 
+    // weil die Funktion des Decorators hier so simpel ist, könnte man es relativ einfach prozedurell programmieren.
     @Override
     public double umrechnen(String variante, double betrag) {
         return super.umrechnen(variante, betrag) + 5; // 5 € fix dazu

@@ -3,6 +3,7 @@ package net.microwonk.microarchitecture.decorator;
 import net.microwonk.microarchitecture.IUmrechnen;
 import net.microwonk.microarchitecture.WR;
 
+// wie ein wrapper, kann mit bestimmten komplexitäten helfen, aber für diesen Zweck etwas overkill
 public class WRDecorator extends WR {
     protected IUmrechnen umrechner;
 
@@ -17,6 +18,6 @@ public class WRDecorator extends WR {
 
     @Override
     public double getFaktor() {
-        return 0;
+        return umrechner.getFaktor();
     }
 }
