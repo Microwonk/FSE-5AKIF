@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="fse_all:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/fse_all_jar</output-path>
+    <root id="archive" name="fse_all.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="fse_all" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/jdom/jdom/1.0/jdom-1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/rome/rome/1.0/rome-1.0.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
