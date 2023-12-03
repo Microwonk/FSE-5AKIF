@@ -7,7 +7,12 @@ import java.sql.*;
 
 public class Main {
 
-    public static void jdbcTests() {
+    public static void main(String[] args) {
+        jdbcInitial();
+        createNewTable();
+    }
+
+    public static void jdbcInitial() {
         try (Connection con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/php13", "root", "123")) {
 
             val stmt = con.createStatement();
@@ -54,5 +59,26 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    public static void createNewTable() {
+        try (Connection con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/php13", "root", "123")) {
+
+            val stmt = con.createStatement();
+
+            // einen neuen Table erstellen
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS new_table "
+                    + "(id INT PRIMARY KEY AUTO_INCREMENT, "
+                    + " text_column VARCHAR(255), "
+                    + " number_column INT)";
+
+            stmt.executeUpdate(createTableSQL);
+
+            System.out.println("Neuer table erstellt!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
