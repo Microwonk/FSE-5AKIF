@@ -17,6 +17,7 @@ public class HashFinderExtreme {
     private static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
     private static final int NUM_THREADS_SUBTRACTION = 2;
     private static final long WORKLOAD_PER_THREAD = Long.MAX_VALUE / (NUM_THREADS - NUM_THREADS_SUBTRACTION);
+
     private int DIFFICULTY = 6;
     private String MESSAGE = "Hello World!";
     private String HASHED_NONCE_MESSAGE;
@@ -27,10 +28,6 @@ public class HashFinderExtreme {
 
     public void run(String message, int difficulty, FileWriter writer) {
         try {
-            String hashedNonceMessage;
-            String nonceMessage;
-            long finalNonce;
-
             Thread[] threads = new Thread[NUM_THREADS - NUM_THREADS_SUBTRACTION];
 
             DIFFICULTY = difficulty;
@@ -64,43 +61,6 @@ public class HashFinderExtreme {
         } catch (IOException e) {
             log.severe("Failed to write benchmark results: " + e);
         }
-    }
-
-    public static void main(String... args) throws IOException {
-
-        String message = "";
-        int diff = 0;
-
-        if (args.length > 0) {
-            message = args[0];
-        }
-
-        if (args.length > 1) {
-            try {
-                diff = Integer.parseInt(args[1]);
-            } catch (NumberFormatException e) {
-                System.err.println("Invalid difficulty input. Using the default value.");
-            }
-        }
-
-        if (args.length == 0) {
-            @Cleanup
-            val scanner = new Scanner(System.in);
-
-            System.out.print("Message that may be found a nonce for: ");
-            val msg = scanner.nextLine();
-            message = msg.isEmpty() ? message : msg;
-
-            System.out.print("Difficulty: ");
-            try {
-                val difficulty = scanner.nextLine();
-                diff = Integer.parseInt(difficulty);
-            } catch (Exception ignored) {}
-        }
-
-        @Cleanup
-        FileWriter fw = new FileWriter("benchmark_results.txt");
-        new HashFinderExtreme().run(message, diff, fw);
     }
 
     private void calculateNonce(final int threadId, final long startRange) {
@@ -167,5 +127,42 @@ public class HashFinderExtreme {
             }
         }
         return numZeros % 2 == 0 || (data[numZeros / 2] & 0xF0) == 0;
+    }
+
+    public static void main(String... args) throws IOException {
+
+        String message = "";
+        int diff = 0;
+
+        if (args.length > 0) {
+            message = args[0];
+        }
+
+        if (args.length > 1) {
+            try {
+                diff = Integer.parseInt(args[1]);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid difficulty input. Using the default value.");
+            }
+        }
+
+        if (args.length == 0) {
+            @Cleanup
+            val scanner = new Scanner(System.in);
+
+            System.out.print("Message that may be found a nonce for: ");
+            val msg = scanner.nextLine();
+            message = msg.isEmpty() ? message : msg;
+
+            System.out.print("Difficulty: ");
+            try {
+                val difficulty = scanner.nextLine();
+                diff = Integer.parseInt(difficulty);
+            } catch (Exception ignored) {}
+        }
+
+        @Cleanup
+        FileWriter fw = new FileWriter("benchmark_results.txt");
+        new HashFinderExtreme().run(message, diff, fw);
     }
 }
