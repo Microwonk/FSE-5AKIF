@@ -13,8 +13,8 @@ public class HashFinderBenchmark {
 
         try (FileWriter writer = new FileWriter("benchmark_results.txt")) {
             long cumulative = 0;
-            String randomString = generateRandomString(stringSize);
             for (int i = 0; i < numIterations; i++) {
+                String randomString = generateRandomString(stringSize);
                 long timeTaken = runHashFinder(randomString, difficulty, writer);
                 cumulative += timeTaken;
                 writer.write("Iteration " + (i + 1) + ": " + timeTaken + " ms\n");
