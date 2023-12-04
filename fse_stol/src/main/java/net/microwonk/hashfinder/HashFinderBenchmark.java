@@ -9,17 +9,17 @@ public class HashFinderBenchmark {
     public static void main(String[] args) {
         int numIterations = 100;
         int stringSize = 20;
-        int difficulty = 7;
+        int difficulty = 6;
 
         try (FileWriter writer = new FileWriter("benchmark_results.txt")) {
             long cumulative = 0;
+            String randomString = generateRandomString(stringSize);
             for (int i = 0; i < numIterations; i++) {
-                String randomString = generateRandomString(stringSize);
-                long timeTaken = runHashFinder(randomString, difficulty);
+                long timeTaken = runHashFinder(randomString, difficulty, writer);
                 cumulative += timeTaken;
                 writer.write("Iteration " + (i + 1) + ": " + timeTaken + " ms\n");
             }
-            writer.write("All measured " + (cumulative / numIterations) + '\n');
+            writer.write("All measured " + (cumulative / numIterations) + " ms on average\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,9 +37,9 @@ public class HashFinderBenchmark {
         return randomString.toString();
     }
 
-    private static long runHashFinder(String message, int difficulty) {
+    private static long runHashFinder(String message, int difficulty, FileWriter writer) {
         long startTime = System.currentTimeMillis();
-        HashFinderExtreme.main(message, String.valueOf(difficulty));
+        new HashFinderExtreme().run(message, difficulty, writer);
         long endTime = System.currentTimeMillis();
         return endTime - startTime;
     }

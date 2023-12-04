@@ -4,6 +4,8 @@ import lombok.Cleanup;
 import lombok.extern.java.Log;
 import lombok.val;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -14,30 +16,68 @@ import java.util.stream.IntStream;
 public class HashFinderExtreme {
     private static final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
     private static final int NUM_THREADS_SUBTRACTION = 2;
-    private static int DIFFICULTY = 6;
-    private static String MESSAGE = "Hello World!";
-    private static String HASHED_NONCE_MESSAGE;
-    private static String NONCE_MESSAGE;
-    private static long RANGE_SIZE;
-    private static long FINAL_NONCE;
+    private static final long WORKLOAD_PER_THREAD = Long.MAX_VALUE / (NUM_THREADS - NUM_THREADS_SUBTRACTION);
+    private int DIFFICULTY = 6;
+    private String MESSAGE = "Hello World!";
+    private String HASHED_NONCE_MESSAGE;
+    private String NONCE_MESSAGE;
+    private long FINAL_NONCE;
 
-    private static void calculateOptimalRange() {
-        RANGE_SIZE = (Long.MAX_VALUE / NUM_THREADS - NUM_THREADS_SUBTRACTION) / DIFFICULTY / MESSAGE.length() / 1000;
-        System.out.println("Range size used: " + RANGE_SIZE);
+    private final AtomicLong validNonce = new AtomicLong(-1);
+
+    public void run(String message, int difficulty, FileWriter writer) {
+        try {
+            String hashedNonceMessage;
+            String nonceMessage;
+            long finalNonce;
+
+            Thread[] threads = new Thread[NUM_THREADS - NUM_THREADS_SUBTRACTION];
+
+            DIFFICULTY = difficulty;
+            MESSAGE = message;
+
+            long startTime = System.currentTimeMillis();
+
+            IntStream.range(0, NUM_THREADS - NUM_THREADS_SUBTRACTION).forEach(i -> {
+                threads[i] = new Thread(() -> calculateNonce(i, WORKLOAD_PER_THREAD * i));
+                threads[i].start();
+            });
+
+            Arrays.stream(threads).forEach(thread -> {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    log.severe("Failed to join working Threads: " + e);
+                }
+            });
+
+            long endTime = System.currentTimeMillis();
+
+            // metrics
+            writer.write("Result Found in: " + (endTime - startTime) + " ms, or " + (double) (endTime - startTime) / 1000.0 + " s.\n");
+            writer.write("-".repeat(40) + "\n");
+            writer.write("The Input: \"" + message + "\"\n");
+            writer.write("Valid nonce found: " + FINAL_NONCE + "\n");
+            writer.write("Un-hashed concatenation: " + NONCE_MESSAGE + "\n");
+            writer.write("The resulting Hash: " + HASHED_NONCE_MESSAGE + "\n");
+
+        } catch (IOException e) {
+            log.severe("Failed to write benchmark results: " + e);
+        }
     }
 
-    private static final AtomicLong validNonce = new AtomicLong(-1);
-    private static final AtomicLong largestNonceRangeEnd = new AtomicLong(0);
+    public static void main(String... args) throws IOException {
 
-    public static void main(String... args) {
+        String message = "";
+        int diff = 0;
 
         if (args.length > 0) {
-            MESSAGE = args[0];
+            message = args[0];
         }
 
         if (args.length > 1) {
             try {
-                DIFFICULTY = Integer.parseInt(args[1]);
+                diff = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
                 System.err.println("Invalid difficulty input. Using the default value.");
             }
@@ -49,84 +89,40 @@ public class HashFinderExtreme {
 
             System.out.print("Message that may be found a nonce for: ");
             val msg = scanner.nextLine();
-            MESSAGE = msg.isEmpty() ? MESSAGE : msg;
+            message = msg.isEmpty() ? message : msg;
 
             System.out.print("Difficulty: ");
             try {
-                val diff = scanner.nextLine();
-                DIFFICULTY = Integer.parseInt(diff);
+                val difficulty = scanner.nextLine();
+                diff = Integer.parseInt(difficulty);
             } catch (Exception ignored) {}
         }
 
-        calculateOptimalRange();
-
-        Thread[] threads = new Thread[NUM_THREADS - NUM_THREADS_SUBTRACTION]; // nicht alle erhaeltlichen Threads benutzen
-
-        // metrics
-        long startTime = System.currentTimeMillis();
-
-        IntStream.range(0, NUM_THREADS - NUM_THREADS_SUBTRACTION).forEach(i -> {
-            threads[i] = new Thread(() -> calculateNonce(i, RANGE_SIZE * i));
-            threads[i].start();
-        });
-
-        Arrays.stream(threads).forEach(thread -> {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                log.severe("Failed to join working Threads: " + e);
-            }
-        });
-
-        // metrics
-        long endTime = System.currentTimeMillis();
-
-        System.out.println("\nResult Found in: " + (endTime - startTime) + " ms, or " + (double)(endTime - startTime) / 1000.0 + " s.");
-        System.out.println("-".repeat(40));
-        System.out.println("The Input: \"" + MESSAGE + '"');
-        System.out.println("Valid nonce found: " + FINAL_NONCE);
-        System.out.println("Un-hashed concatenation: " + NONCE_MESSAGE);
-        System.out.println("The resulting Hash: " + HASHED_NONCE_MESSAGE);
+        @Cleanup
+        FileWriter fw = new FileWriter("benchmark_results.txt");
+        new HashFinderExtreme().run(message, diff, fw);
     }
 
-    private static void calculateNonce(int threadId, long startRange) {
+    private void calculateNonce(final int threadId, final long startRange) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] messageBytes = MESSAGE.getBytes();
-            boolean hasDoneOnce = false;
-
-            long range = startRange + RANGE_SIZE;
             long nonce = startRange;
 
             while (validNonce.get() == -1) {
-                if (hasDoneOnce) {
-                    nonce = largestNonceRangeEnd.getAndAdd(RANGE_SIZE);
-                    range = nonce + RANGE_SIZE;
-                }
+                System.out.println("[Thread " + threadId + "] started searching from " + startRange + " to " + startRange + WORKLOAD_PER_THREAD);
 
-                System.out.println("[Thread " + threadId + "] started searching from " + nonce + " to " + range);
-
-                long steps = 0;
-
-                for (; nonce < range; nonce++) {
-                    steps++;
+                for (; nonce < startRange + WORKLOAD_PER_THREAD; nonce++) {
                     byte[] nonceBytes = Long.toString(nonce).getBytes();
                     byte[] dataToHash = concatByteArrays(messageBytes, nonceBytes);
                     byte[] hash = md.digest(dataToHash);
 
                     if (startsWithZeroBytes(hash, DIFFICULTY)) {
-                        handleValidNonce(threadId, nonce, steps, dataToHash, hash);
-                        return;
+                        handleValidNonce(threadId, nonce, dataToHash, hash);
                     }
-
                     if (validNonce.get() != -1) {
                         return;
                     }
-                }
-
-                if (validNonce.get() == -1) {
-                    hasDoneOnce = true;
-                    System.out.println("[Thread " + threadId + "] finished searching from " + (nonce - RANGE_SIZE) + " to " + nonce);
                 }
             }
         } catch (Exception e) {
@@ -134,7 +130,7 @@ public class HashFinderExtreme {
         }
     }
 
-    private static void handleValidNonce(int threadId, long nonce, long steps, byte[] dataToHash, byte[] hash) {
+    private void handleValidNonce(int threadId, long nonce, byte[] dataToHash, byte[] hash) {
         synchronized (HashFinderExtreme.class) {
             if (validNonce.get() == -1) {
                 validNonce.set(nonce);
@@ -142,7 +138,7 @@ public class HashFinderExtreme {
             }
         }
 
-        log.info("[Thread " + threadId + "] found a valid nonce: " + FINAL_NONCE + " in " + steps + " steps.");
+        log.info("[Thread " + threadId + "] found a valid nonce: " + FINAL_NONCE);
 
         NONCE_MESSAGE = byteArrayToString(dataToHash, false);
         HASHED_NONCE_MESSAGE = byteArrayToString(hash, true);
