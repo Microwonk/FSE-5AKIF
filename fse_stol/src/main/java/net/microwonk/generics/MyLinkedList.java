@@ -1,17 +1,23 @@
 package net.microwonk.generics;
 
-import java.util.Objects;
+// imports für nicht implementierte methoden
+import jdk.jshell.spi.ExecutionControl.NotImplementedException;
+import lombok.SneakyThrows;
+
+import java.lang.reflect.Array;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class MyLinkedList<E> implements Iterable<E> {
+public class MyLinkedList<E> implements List<E>, Iterable<E> {
 
     private ElementWrapper<E> head;
-    private int size;
+    private int size = 0;
 
-    public void add(final E toAdd) {
+    @Override
+    public boolean add(final E toAdd) {
         ElementWrapper<E> newE = new ElementWrapper<>(toAdd);
         if (head == null) {
             head = newE;
@@ -19,13 +25,15 @@ public class MyLinkedList<E> implements Iterable<E> {
             last().nextElement = newE;
         }
         size++;
+        return true;
     }
 
-    public void insert(final E toInsert, int index) {
+    @Override
+    public void add(int index, E element) {
         if (index < 0) {
             throw new IllegalArgumentException("Index cannot be negative");
         }
-        ElementWrapper<E> newE = new ElementWrapper<>(toInsert);
+        ElementWrapper<E> newE = new ElementWrapper<>(element);
 
         if (index == 0) {
             newE.nextElement = head;
@@ -51,8 +59,14 @@ public class MyLinkedList<E> implements Iterable<E> {
         size++;
     }
 
+    @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return head == null;
     }
 
     private ElementWrapper<E> last() {
@@ -65,14 +79,14 @@ public class MyLinkedList<E> implements Iterable<E> {
         return lastE;
     }
 
-    @SuppressWarnings("unused")
-    public E remove(final E element) {
-        if (head == null) return null;
+    @Override
+    public boolean remove(final Object element) {
+        if (head == null) return false;
 
         if (head.data.equals(element)) {
-            E removedData = head.data;
             head = head.nextElement;
-            return removedData;
+            size--;
+            return true;
         }
 
         ElementWrapper<E> current = head;
@@ -83,16 +97,194 @@ public class MyLinkedList<E> implements Iterable<E> {
             current = current.nextElement;
         }
 
-        if (current == null) return null;
+        if (current == null) return false;
 
-        E removedData = current.data;
         previous.nextElement = current.nextElement;
 
         size--;
-        return removedData;
+        return true;
     }
 
-    @SuppressWarnings("unused")
+    @Override
+    public E get(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        ElementWrapper<E> current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.nextElement;
+        }
+
+        return current.data;
+    }
+
+    @Override
+    public E set(int index, E element) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        ElementWrapper<E> current = head;
+        for (int i = 0; i < index; i++) {
+            current = current.nextElement;
+        }
+
+        E oldValue = current.data;
+        current.data = element;
+        return oldValue;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        for (E element : this) {
+            if (Objects.equals(element, o)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object o : c) {
+            if (!contains(o)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        for (E element : c) {
+            add(element);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        MyLinkedList<E> newList = new MyLinkedList<>();
+        newList.addAll(c);
+
+        if (index == 0) {
+            newList.last().nextElement = head;
+            head = newList.head;
+        } else {
+            ElementWrapper<E> current = head;
+            ElementWrapper<E> previous = null;
+            for (int i = 0; i < index; i++) {
+                previous = current;
+                current = current.nextElement;
+            }
+
+            previous.nextElement = newList.head;
+            newList.last().nextElement = current;
+        }
+
+        size += newList.size;
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
+        Iterator<E> iterator = iterator();
+        while (iterator.hasNext()) {
+            if (c.contains(iterator.next())) {
+                iterator.remove();
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
+        Iterator<E> iterator = iterator();
+        while (iterator.hasNext()) {
+            if (!c.contains(iterator.next())) {
+                iterator.remove();
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    // List iterator nicht implementiert
+
+    @SneakyThrows
+    @Override
+    public ListIterator<E> listIterator() {
+        throw new NotImplementedException("");
+    }
+
+    @SneakyThrows
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        throw new NotImplementedException("");
+    }
+
+    // --------------------------------
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
+            throw new IndexOutOfBoundsException("FromIndex: " + fromIndex + ", ToIndex: " + toIndex + ", Size: " + size);
+        }
+
+        MyLinkedList<E> subList = new MyLinkedList<>();
+        ElementWrapper<E> current = head;
+
+        for (int i = 0; i < fromIndex; i++) {
+            current = current.nextElement;
+        }
+
+        for (int i = fromIndex; i < toIndex; i++) {
+            subList.add(current.data);
+            current = current.nextElement;
+        }
+
+        return subList;
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        int index = 0;
+        for (E element : this) {
+            if (Objects.equals(element, o)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        int lastIndex = -1;
+        int index = 0;
+        for (E element : this) {
+            if (Objects.equals(element, o)) {
+                lastIndex = index;
+            }
+            index++;
+        }
+        return lastIndex;
+    }
+
+    @Override
+    public void clear() {
+        head = null;
+    }
+
+    @Override
     public E remove(final int index) {
         if (index < 0) {
             throw new IllegalArgumentException("Index cannot be negative");
@@ -125,9 +317,46 @@ public class MyLinkedList<E> implements Iterable<E> {
         return removedData;
     }
 
+    public E peek() {
+        return last().data;
+    }
+
+    public E pop() {
+        return remove(size - 1);
+    }
+
+    public E push(E element) {
+        add(element);
+        return element;
+    }
+
     @Override
     public java.util.Iterator<E> iterator() {
-        return new Iterator();
+        return new IteratorImpl();
+    }
+
+    @Override
+    public Object[] toArray() {
+        Object[] array = new Object[size];
+        int index = 0;
+        for (E element: this) {
+            array[index++] = element;
+        }
+        return array;
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        if (a.length < size) {
+            a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+        } else if (a.length > size) {
+            a[size] = null;
+        }
+        int index = 0;
+        for (E element : this) {
+            a[index++] = (T) element;
+        }
+        return a;
     }
 
     public Stream<E> stream() {
@@ -154,7 +383,7 @@ public class MyLinkedList<E> implements Iterable<E> {
         );
     }
 
-    public static <T> MyLinkedList<T> merge(MyLinkedList<T> left, MyLinkedList<T> right) {
+    private static <T> MyLinkedList<T> merge(MyLinkedList<T> left, MyLinkedList<T> right) {
         left.last().nextElement = right.head;
         left.size += right.size;
         return left;
@@ -165,7 +394,7 @@ public class MyLinkedList<E> implements Iterable<E> {
         return "[" + head.toString() + ']';
     }
 
-    private class Iterator implements java.util.Iterator<E> {
+    private class IteratorImpl implements java.util.Iterator<E> {
         private ElementWrapper<E> current = head;
 
         @Override
