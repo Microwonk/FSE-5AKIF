@@ -12,14 +12,17 @@ public class UserCliMenu {
 
     public static void main(String... args) {
         while (true) {
-            System.out.println("User DAO CLI Menu:");
-            System.out.println("1. User mit ID holen");
-            System.out.println("2. Alle Users holen");
-            System.out.println("3. User kreieren");
-            System.out.println("4. User Updaten");
-            System.out.println("5. User Löschen");
-            System.out.println("0. Beenden");
-            System.out.print("Eingabe: ");
+            System.out.print(
+                    """
+                            User DAO CLI Menu:
+                            1. User mit ID holen
+                            2. Alle Users holen
+                            3. User kreieren
+                            4. User Updaten
+                            5. User Löschen
+                            0. Beenden
+                            Eingabe:\s"""
+            );
 
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -37,7 +40,6 @@ public class UserCliMenu {
                 }
                 default -> System.out.println("Invalide Eingabe, bitte nochmals versuchen oder mit 0 beenden");
             }
-            // anzeige pause
             try { Thread.sleep(1000); } catch (Exception ignored) { }
         }
     }
