@@ -1,27 +1,27 @@
 package net.microwonk.aufg_jdbc.dao_land.domain;
 
-import lombok.Getter;
-
-@Getter
 public abstract class BaseEntity {
-    public Long ID;
-
-    public BaseEntity(Long ID){
-        setId(ID);
+    public Long id;
+    public BaseEntity(Long id){
+        setId(id);
     }
 
-    public void setId(Long ID) {
-        if (ID == null || ID > 0) {
-            this.ID = ID;
+    public long getId(){
+        return this.id;
+    }
+
+    public void setId(Long id){
+        if(id == null || id >= 0){
+            this.id = id;
         } else {
-            throw new InvalidValueException("Kurs-ID muss größer gleich 0 sein!");
+            throw new InvalidValueException("Kurs-ID muss größer 0 sein");
         }
     }
 
     @Override
     public String toString() {
         return "BaseEntity{" +
-                "ID=" + ID +
+                "id=" + id +
                 '}';
     }
 }

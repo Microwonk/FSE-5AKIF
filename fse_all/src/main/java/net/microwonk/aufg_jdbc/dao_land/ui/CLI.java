@@ -1,30 +1,48 @@
 package net.microwonk.aufg_jdbc.dao_land.ui;
 
-import lombok.Cleanup;
+import net.microwonk.aufg_jdbc.dao_land.dataaccess.MySqlCourseRepository;
+import net.microwonk.aufg_jdbc.dao_land.dataaccess.MySqlStudentRepository;
 
 import java.util.Scanner;
 
 public class CLI {
+    private final Scanner s;
+    private String input;
 
-    public static void start() {
-        @Cleanup
-        Scanner scanner = new Scanner(System.in);
-        while(true) {
-            showMenu();
-            switch(scanner.nextLine()){
-                case "1" -> System.out.println("Kurseingabe");
-                case "2" -> System.out.println("Alle Kurse anzeigen");
-                case "3" -> {
-                    System.out.println("Auf Wiedersehen!");
-                    System.exit(0);
-                }
-                default -> System.out.println("Falsche Eingabe");
-            }
-        }
+    private final static CLI INSTANCE;
+
+    static {
+        INSTANCE = new CLI();
     }
 
-    private static void showMenu() {
-        System.out.println("\n______________________ KURSMANAGEMENT ______________________");
-        System.out.println("(1) Kurs eingeben \t (2) Alle Kurse anzeigen \t (3) ENDE");
+    public static CLI get() {
+        return INSTANCE;
+    }
+
+    private CLI(){
+        s = new Scanner(System.in);
+        input = "";
+    }
+
+    public void start() {
+        while (!input.equals("x")) {
+            System.out.println("(1) CourseMenu \t (2) StudentMenu \t (x) Abbrechen \t");
+            input = s.nextLine();
+            switch (input) {
+                case "1" -> {
+                    System.out.println("Kurs Menu");
+                    new CLICourse(new MySqlCourseRepository()).start();
+                }
+                case "2" -> {
+                    System.out.println("Student Menu");
+                    new CLIStudent(new MySqlStudentRepository()).start();
+                }
+                case "x" -> {
+                    System.out.println("Programm wird beendet");
+                    System.exit(0);
+                }
+                default -> System.out.println("Bitte geben sie einen gültigen Wert ein");
+            }
+        }
     }
 }
