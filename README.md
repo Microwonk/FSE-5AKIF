@@ -1,5 +1,12 @@
 # FSE-5AKIF
 
 Falls neue Projekte im main-branch nicht zu finden sind, sind diese in deren respective "feature branches" zu finden (Github Flow).
-Ich werd mein Bestes versuchen, gut zu kommentieren :)
-Bei fragen gerne auf Discord melden!
+
+### Interfaces und abstrakte Klassen
+in src/main/java/net/micrwonk/aufg_interfaces_und_abstrakte_klassen/
+
+### Mikrowarchitektur
+in src/main/java/net/micrwonk/microarchitecture/
+
+### Datenpersistenz-aufgaben
+in src/main/java/net/micrwonk/aufg_jdbc/
