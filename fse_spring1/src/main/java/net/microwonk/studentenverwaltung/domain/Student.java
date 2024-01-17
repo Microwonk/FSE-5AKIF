@@ -31,5 +31,4 @@ public class Student {
         this.name = name;
         this.plz = plz;
     }
-
 }

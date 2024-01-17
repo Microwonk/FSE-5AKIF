@@ -2,25 +2,27 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Studenten-Thymeleaf</title>
+    <link rel="stylesheet" th:href="@{/bootstrap.min.css}">
 </head>
-<body>
+<body class="container mt-5">
+
 <h1>Student eintragen</h1>
 
-<form th:action="@{/web/insertstudent}" method="post" th:object="${mystudent}">
+<form class="mt-4" th:action="@{/web/insertstudent}" method="post" th:object="${mystudent}">
     <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" id="name" th:field="*{name}"/>
-        <p th:if="${#fields.hasErrors('name')}" th:errorclass="error" th:errors="*{name}"/>
+        <input type="text" class="form-control" id="name" th:field="*{name}" required/>
+        <small class="form-text text-danger" th:if="${#fields.hasErrors('name')}" th:errorclass="error" th:errors="*{name}"></small>
     </div>
 
     <div class="form-group">
         <label for="plz">PLZ</label>
-        <input type="text" id="plz" th:field="*{plz}"/>
-        <p th:if="${#fields.hasErrors('plz')}" th:errorclass="error" th:errors="*{plz}"/>
+        <input type="text" class="form-control" id="plz" th:field="*{plz}" required/>
+        <small class="form-text text-danger" th:if="${#fields.hasErrors('plz')}" th:errorclass="error" th:errors="*{plz}"></small>
     </div>
-    <button type="submit" name="action" value="save">speichern</button>
-</form>
 
+    <button type="submit" class="btn btn-primary" name="action" value="save">speichern</button>
+</form>
 </body>
 </html>

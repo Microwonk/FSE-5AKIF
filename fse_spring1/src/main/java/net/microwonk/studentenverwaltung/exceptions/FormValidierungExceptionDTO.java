@@ -12,14 +12,12 @@ public class FormValidierungExceptionDTO {
     String code;
     private HashMap<String,String> formValidationErrors;
 
-    public FormValidierungExceptionDTO(String code)
-    {
+    public FormValidierungExceptionDTO(String code) {
         this.code = code;
         this.formValidationErrors = new HashMap<>();
     }
 
-    public void addFormValidationError(String fieldName, String fieldErrorMessage)
-    {
+    public void addFormValidationError(String fieldName, String fieldErrorMessage) {
         this.formValidationErrors.put(fieldName,fieldErrorMessage);
     }
 

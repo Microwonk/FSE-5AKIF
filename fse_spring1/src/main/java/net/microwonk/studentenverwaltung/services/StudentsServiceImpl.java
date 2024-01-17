@@ -1,5 +1,6 @@
 package net.microwonk.studentenverwaltung.services;
 
+import lombok.AllArgsConstructor;
 import net.microwonk.studentenverwaltung.domain.Student;
 import net.microwonk.studentenverwaltung.exceptions.StudentNichtGefunden;
 import net.microwonk.studentenverwaltung.repositories.DbZugriffStudenten;
@@ -8,44 +9,41 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class StudentenServiceImpl implements StudentenService {
+@AllArgsConstructor
+public class StudentsServiceImpl implements StudentsService {
 
     private final DbZugriffStudenten dbZugriffStudenten;
 
-    public StudentenServiceImpl(DbZugriffStudenten dbZugriffStudenten) {
-        this.dbZugriffStudenten = dbZugriffStudenten;
-    }
-
     @Override
     public List<Student> allStudents() {
-        return this.dbZugriffStudenten.allStudents();
+        return dbZugriffStudenten.allStudents();
     }
 
     @Override
-    public Student studentEinfuegen(Student student) {
-        return this.dbZugriffStudenten.insertStudent(student);
+    public Student insertStudent(Student student) {
+        return dbZugriffStudenten.insertStudent(student);
     }
 
     @Override
-    public Student studentUpdaten(Student student) throws StudentNichtGefunden {
-        Student studentAusDb = this.dbZugriffStudenten.studentWithId(student.getId());
+    public Student updateStudent(Student student) throws StudentNichtGefunden {
+        Student studentAusDb = dbZugriffStudenten.studentWithId(student.getId());
         studentAusDb.setName(student.getName());
         studentAusDb.setPlz(student.getPlz());
-        return this.dbZugriffStudenten.insertStudent(studentAusDb);
+        return dbZugriffStudenten.insertStudent(studentAusDb);
     }
 
     @Override
-    public Student studentMitId(Long id) throws StudentNichtGefunden {
-        return this.dbZugriffStudenten.studentWithId(id);
+    public Student studentWithId(Long id) throws StudentNichtGefunden {
+        return dbZugriffStudenten.studentWithId(id);
     }
 
     @Override
-    public List<Student> alleStudentenMitPlz(String plz) {
-        return this.dbZugriffStudenten.allStudentsWithPlz(plz);
+    public List<Student> studentsWithPlz(String plz) {
+        return dbZugriffStudenten.allStudentsWithPlz(plz);
     }
 
     @Override
     public Student deleteStudent(Long id) throws StudentNichtGefunden {
-        return this.dbZugriffStudenten.deleteStudent(id);
+        return dbZugriffStudenten.deleteStudent(id);
     }
 }

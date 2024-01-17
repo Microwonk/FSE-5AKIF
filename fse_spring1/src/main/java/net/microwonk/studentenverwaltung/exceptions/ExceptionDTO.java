@@ -8,8 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ExceptionDTO {
-
     private String code;
     private String message;
-
 }

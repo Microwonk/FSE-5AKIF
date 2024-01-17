@@ -6,9 +6,9 @@ import net.microwonk.studentenverwaltung.exceptions.StudentNichtGefunden;
 import java.util.List;
 
 public interface DbZugriffStudenten {
-    Student studentSpeichern(Student student);
-    List<Student> alleStudenten();
-    List<Student> alleStudentenAusDemOrt(String plz);
-    Student studentMitId(Long id) throws StudentNichtGefunden;
-    Student studentLoeschenMitId(Long id) throws StudentNichtGefunden;
+    Student insertStudent(Student student);
+    List<Student> allStudents();
+    List<Student> allStudentsWithPlz(String plz);
+    Student studentWithId(Long id) throws StudentNichtGefunden;
+    Student deleteStudent(Long id) throws StudentNichtGefunden;
 }

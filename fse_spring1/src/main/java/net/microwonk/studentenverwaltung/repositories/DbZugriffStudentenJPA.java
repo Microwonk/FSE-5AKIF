@@ -17,29 +17,29 @@ public class DbZugriffStudentenJPA implements DbZugriffStudenten {
     }
 
     @Override
-    public Student studentSpeichern(Student student) {
+    public Student insertStudent(Student student) {
         return this.studentJPARepo.save(student);
     }
 
     @Override
-    public List<Student> alleStudenten() {
+    public List<Student> allStudents() {
         return this.studentJPARepo.findAll();
     }
 
     @Override
-    public List<Student> alleStudentenAusDemOrt(String plz) {
+    public List<Student> allStudentsWithPlz(String plz) {
         return this.studentJPARepo.findAllByPlz(plz);
     }
 
     @Override
-    public Student studentMitId(Long id) throws StudentNichtGefunden {
+    public Student studentWithId(Long id) throws StudentNichtGefunden {
         Optional<Student> optStudent = this.studentJPARepo.findById(id);
         return optStudent.orElseThrow(() -> new StudentNichtGefunden("Student mit der Id " + id + " nicht gefunden!"));
     }
 
     @Override
-    public Student studentLoeschenMitId(Long id) throws StudentNichtGefunden {
-      Student studentAusDb = this.studentMitId(id);
+    public Student deleteStudent(Long id) throws StudentNichtGefunden {
+      Student studentAusDb = this.studentWithId(id);
       this.studentJPARepo.deleteById(studentAusDb.getId());
       return studentAusDb;
     }

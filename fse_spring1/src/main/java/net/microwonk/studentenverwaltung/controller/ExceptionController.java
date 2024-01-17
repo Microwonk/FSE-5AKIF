@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionController {
 
     @ExceptionHandler(StudentNichtGefunden.class)
-    public ResponseEntity<ExceptionDTO> studentNichtGefunden(StudentNichtGefunden studentNichtGefunden)
-    {
+    public ResponseEntity<ExceptionDTO> studentNichtGefunden(StudentNichtGefunden studentNichtGefunden) {
         return new ResponseEntity<>(new ExceptionDTO("1000",studentNichtGefunden.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(StudentValidierungFehlgeschlagen.class)
-    public ResponseEntity<FormValidierungExceptionDTO> studentValidierungFehlgeschlagen(StudentValidierungFehlgeschlagen studentValidierungFehlgeschlagen)
-    {
+    public ResponseEntity<FormValidierungExceptionDTO> studentValidierungFehlgeschlagen(
+            StudentValidierungFehlgeschlagen studentValidierungFehlgeschlagen
+    ) {
         return new ResponseEntity<>(studentValidierungFehlgeschlagen.getErrorMap(), HttpStatus.BAD_REQUEST);
     }
 }

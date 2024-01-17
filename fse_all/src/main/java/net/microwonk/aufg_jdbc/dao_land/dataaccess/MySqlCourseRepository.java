@@ -15,7 +15,6 @@ public class MySqlCourseRepository extends MySqlBaseRepository implements MyCour
 
     public MySqlCourseRepository() {
         super();
-
     }
 
     @Override
@@ -89,7 +88,6 @@ public class MySqlCourseRepository extends MySqlBaseRepository implements MyCour
         String sql = "UPDATE " + this.ENTITY_NAME + " SET name = ?, `description` = ?, hours = ?, `begindate` = ?, enddate = ?, coursetype = ? WHERE `courses`.`id` = ?";
 
         try (PreparedStatement preparedStatement = super.getCon().prepareStatement(sql)) {
-            ;
             sets(entity, preparedStatement);
             preparedStatement.setLong(7, entity.getId());
 
