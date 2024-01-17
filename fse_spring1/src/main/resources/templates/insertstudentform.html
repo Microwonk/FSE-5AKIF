@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Student eintragen</h1>
+
+<form th:action="@{/web/insertstudent}" method="post" th:object="${mystudent}">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" th:field="*{name}"/>
+        <p th:if="${#fields.hasErrors('name')}" th:errorclass="error" th:errors="*{name}"/>
+    </div>
+
+    <div class="form-group">
+        <label for="plz">PLZ</label>
+        <input type="text" id="plz" th:field="*{plz}"/>
+        <p th:if="${#fields.hasErrors('plz')}" th:errorclass="error" th:errors="*{plz}"/>
+    </div>
+    <button type="submit" name="action" value="save">speichern</button>
+</form>
+
+</body>
+</html>

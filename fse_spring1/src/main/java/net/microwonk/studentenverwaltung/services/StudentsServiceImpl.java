@@ -17,35 +17,35 @@ public class StudentenServiceImpl implements StudentenService {
     }
 
     @Override
-    public List<Student> alleStudenten() {
-        return this.dbZugriffStudenten.alleStudenten();
+    public List<Student> allStudents() {
+        return this.dbZugriffStudenten.allStudents();
     }
 
     @Override
     public Student studentEinfuegen(Student student) {
-        return this.dbZugriffStudenten.studentSpeichern(student);
+        return this.dbZugriffStudenten.insertStudent(student);
     }
 
     @Override
     public Student studentUpdaten(Student student) throws StudentNichtGefunden {
-        Student studentAusDb = this.dbZugriffStudenten.studentMitId(student.getId());
+        Student studentAusDb = this.dbZugriffStudenten.studentWithId(student.getId());
         studentAusDb.setName(student.getName());
         studentAusDb.setPlz(student.getPlz());
-        return this.dbZugriffStudenten.studentSpeichern(studentAusDb);
+        return this.dbZugriffStudenten.insertStudent(studentAusDb);
     }
 
     @Override
     public Student studentMitId(Long id) throws StudentNichtGefunden {
-        return this.dbZugriffStudenten.studentMitId(id);
+        return this.dbZugriffStudenten.studentWithId(id);
     }
 
     @Override
     public List<Student> alleStudentenMitPlz(String plz) {
-        return this.dbZugriffStudenten.alleStudentenAusDemOrt(plz);
+        return this.dbZugriffStudenten.allStudentsWithPlz(plz);
     }
 
     @Override
-    public Student studentLoeschenMitId(Long id) throws StudentNichtGefunden {
-        return this.dbZugriffStudenten.studentLoeschenMitId(id);
+    public Student deleteStudent(Long id) throws StudentNichtGefunden {
+        return this.dbZugriffStudenten.deleteStudent(id);
     }
 }

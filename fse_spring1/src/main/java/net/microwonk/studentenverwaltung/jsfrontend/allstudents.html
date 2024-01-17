@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="jquery-3.3.1.min.js"></script>
+</head>
+<body class="container mt-5">
+
+<h1>Studentenliste</h1>
+
+<table class="table" id="studentTable"></table>
+
+<a class="btn btn-primary mt-3" href="insertstudent.html">Student hinzufügen</a>
+
+<script>
+
+    getAllData();
+
+    async function getAllData() {
+        const table = document.getElementById('studentTable')
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/students',
+            {
+                method: 'GET',
+                cache: 'no-cache',
+                headers: {
+                    'Accept':'application/json'
+                }
+            });
+            const data = await response.json();
+
+            while(table.rows[0]) table.deleteRow(0) // alle rows entfernen
+
+            let row = table.insertRow();
+            row.insertCell(0).innerHTML = 'ID';
+            row.insertCell(1).innerHTML = 'Name';
+            row.insertCell(2).innerHTML = 'PLZ';
+            row.insertCell(3).innerHTML = 'Aktion';
+
+            data.forEach(student => {
+                let row = table.insertRow();
+                row.insertCell(0).innerHTML = student.id;
+                row.insertCell(1).innerHTML = student.name;
+                row.insertCell(2).innerHTML = student.plz;
+                row.insertCell(3).innerHTML = '<button type="button" class="btn btn-danger" onclick="deleteStudent(' + student.id + ')">Löschen</button>';    
+            });
+        } catch (e) {
+            table.innerHTML = "Studenten konnten nicht geladen werden";
+        }
+    
+    }
+
+    async function deleteStudent(id) {
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/students/'+id,
+            {
+                method: 'DELETE',
+                cache: 'no-cache',
+                header: {
+                    'Accept':'application/json'
+                }
+            });
+            const data = await response.json();
+            await getAllData();
+        } catch (e) {
+            alert("Fehler beim Löschen des Studenten");
+        }
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Studentenliste</h1>
+<table>
+    <th:block th:each="student : ${studenten}">
+        <tr>
+            <td th:text="${student.id}">...</td>
+            <td th:text="${student.name}">...</td>
+            <td th:text="${student.plz}">...</td>
+            <td><a th:href="@{/web/deletestudent/{id}(id=${student.id})}">loeschen</a></td>
+        </tr>
+    </th:block>
+</table>
+
+<a th:href="@{/web/insertstudentform}">Student hinzufügen</a>
+
+</body>
+</html>
