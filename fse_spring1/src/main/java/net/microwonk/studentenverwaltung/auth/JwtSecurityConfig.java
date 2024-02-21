@@ -45,6 +45,4 @@ public class JwtSecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-
 }

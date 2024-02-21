@@ -1,67 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Management</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <script src="jquery-3.3.1.min.js"></script>
-</head>
-<body class="container mt-5">
+  </head>
+  <body class="container mt-5">
+    <h1>Student eintragen</h1>
 
-<h1>Student eintragen</h1>
-
-<form class="mt-4">
-    <div class="form-group">
+    <form class="mt-4">
+      <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" required/>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          name="name"
+          required
+        />
         <small class="form-text text-danger" id="nameError"></small>
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label for="plz">PLZ</label>
-        <input type="text" class="form-control" id="plz" name="plz" required/>
+        <input type="text" class="form-control" id="plz" name="plz" required />
         <small class="form-text text-danger" id="plzError"></small>
-    </div>
+      </div>
 
-    <button type="button" class="btn btn-primary" onclick="sendData()">Speichern</button>
-</form>
+      <button type="button" class="btn btn-primary" onclick="sendData()">
+        Speichern
+      </button>
+    </form>
 
-<script>
-    async function sendData() {
-        const name = $('input[name=name]').val();
-        const plz = $('input[name=plz]').val();
+    <script>
+      async function sendData() {
+        const name = $("input[name=name]").val();
+        const plz = $("input[name=plz]").val();
+        const authorization = "Bearer " + localStorage.getItem("accessToken");
 
         try {
-            const data = await fetch('http://localhost:8080/api/v1/students', 
-            {
-                method: 'POST',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({'name':name, 'plz':plz})
-            }).then(async response => await response.json());
+          const data = await fetch("http://localhost:8080/api/v1/students", {
+            method: "POST",
+            cache: "no-cache",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: authorization,
+            },
+            body: JSON.stringify({ name: name, plz: plz }),
+          }).then(async (response) => await response.json());
 
-            if (data.code && data.code == 9000 && data.formValidationErrors) {
-                if (data.formValidationErrors.name) {
-                    $('#nameError').html(data.formValidationErrors.name);
-                }
-                if (data.formValidationErrors.plz) {
-                    $('#plzError').html(data.formValidationErrors.name);
-                }
-            } else {
-                $('#name').val('');
-                $('#plz').val('');
-                alert("Student eingefügt");
+          if (data.code && data.code == 9000 && data.formValidationErrors) {
+            if (data.formValidationErrors.name) {
+              $("#nameError").html(data.formValidationErrors.name);
             }
-            
+            if (data.formValidationErrors.plz) {
+              $("#plzError").html(data.formValidationErrors.name);
+            }
+          } else {
+            $("#name").val("");
+            $("#plz").val("");
+            alert("Student eingefügt");
+          }
         } catch (e) {
-            alert('Studenten konnte nicht eingefügt werden: ' + e);
+          alert("Studenten konnte nicht eingefügt werden: " + e);
         }
-    }
-</script>
-
-</body>
+      }
+    </script>
+  </body>
 </html>

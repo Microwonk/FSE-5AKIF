@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/students")
 @CrossOrigin(origins = "http://127.0.0.1:5500") // port einstellen für webseite
+@RequestMapping("/api/v1/students")
 @AllArgsConstructor
 public class StudentRestController {
 

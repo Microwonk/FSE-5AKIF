@@ -16,14 +16,48 @@
       >Student hinzufügen</a
     >
 
-    <script>
-      login();
+    <div class="mt-3">
+      <input
+        type="text"
+        class="form-control"
+        id="login"
+        name="login"
+        placeholder="Username"
+      />
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        placeholder="Passwort"
+      />
+      <button class="btn btn-primary" id="loginBtn" onclick="login()">
+        Login
+      </button>
+      <button
+        class="btn btn-danger"
+        id="logoutBtn"
+        style="display: none"
+        onclick="logout()"
+      >
+        Logout
+      </button>
+    </div>
 
-      // Login function
+    <script>
+      // Check if user is already logged in
+      if (localStorage.getItem("accessToken")) {
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("login").style.display = "none";
+        document.getElementById("password").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "block";
+        getAllData();
+      }
+
       async function login() {
-        const loginData = {
-          login: "admin",
-          password: "admin",
+        loginData = {
+          login: $("#login").val(),
+          password: $("#password").val(),
         };
 
         try {
@@ -37,12 +71,17 @@
               body: JSON.stringify(loginData),
             }
           );
-          const { access_token, refresh_token } = await response.json();
-          console.log(access_token);
+          const { accessToken, refreshToken } = await response.json();
 
           // Store tokens securely
-          localStorage.setItem("accessToken", access_token);
-          localStorage.setItem("refreshToken", refresh_token);
+          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+
+          // Show logout button, hide login button
+          document.getElementById("loginBtn").style.display = "none";
+          document.getElementById("login").style.display = "none";
+          document.getElementById("password").style.display = "none";
+          document.getElementById("logoutBtn").style.display = "block";
 
           // Fetch data after successful login
           getAllData();
@@ -51,15 +90,28 @@
         }
       }
 
+      async function logout() {
+        // Clear tokens from localStorage
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
+        // Show login button, hide logout button
+        document.getElementById("loginBtn").style.display = "block";
+        document.getElementById("logoutBtn").style.display = "none";
+
+        // Clear student table
+        document.getElementById("studentTable").innerHTML = "";
+      }
+
       async function getAllData() {
         const accessToken = localStorage.getItem("accessToken");
         const table = document.getElementById("studentTable");
+
         try {
           const response = await fetch(
-            "http://localhost:8080/api/v1/students/",
+            "http://localhost:8080/api/v1/students",
             {
               method: "GET",
-              cache: "no-cache",
               headers: {
                 Authorization: `Bearer ${accessToken}`,
                 Accept: "application/json",
@@ -68,7 +120,7 @@
           );
           const data = await response.json();
 
-          while (table.rows[0]) table.deleteRow(0); // alle rows entfernen
+          while (table.rows[0]) table.deleteRow(0); // Remove existing rows
           let row = table.insertRow();
           row.insertCell(0).innerHTML = "ID";
           row.insertCell(1).innerHTML = "Name";
@@ -80,30 +132,29 @@
             row.insertCell(0).innerHTML = student.id;
             row.insertCell(1).innerHTML = student.name;
             row.insertCell(2).innerHTML = student.plz;
-            row.insertCell(3).innerHTML =
-              '<button type="button" class="btn btn-danger" onclick="deleteStudent(' +
-              student.id +
-              ')">Löschen</button>';
+            row.insertCell(
+              3
+            ).innerHTML = `<button type="button" class="btn btn-danger" onclick="deleteStudent(${student.id})">Löschen</button>`;
           });
-        } catch (e) {
-          console.error(e);
+        } catch (error) {
+          console.error("Error fetching data:", error);
           table.innerHTML = "Studenten konnten nicht geladen werden";
         }
       }
 
-      // Function to delete a student
       async function deleteStudent(id) {
         try {
           const accessToken = localStorage.getItem("accessToken");
-          await fetch("http://localhost:8080/api/v1/students/" + id, {
+          await fetch(`http://localhost:8080/api/v1/students/${id}`, {
             method: "DELETE",
             headers: {
               Authorization: `Bearer ${accessToken}`,
               Accept: "application/json",
             },
           });
-          await getAllData();
+          await getAllData(); // Refresh data after deletion
         } catch (error) {
+          // TODO should indicate that the user is not an admin.
           console.error("Error deleting student:", error);
         }
       }
