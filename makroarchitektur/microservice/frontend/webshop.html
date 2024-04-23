@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    function getallorders()
+    {
+       fetch('http://localhost:9999/api/v1/orders')
+        .then(response => response.json())
+        .then(data => {
+            let erg = "<div>"
+            data.forEach(element => {
+                erg = erg.concat(`<p> Order #${element.orderID} for customer ${element.customerFirstname} ${element.customerLastname.toUpperCase()}. Status <em>[${element.state}]</em>. Ordered products:</p>`)
+                erg = erg.concat('<ol>')
+                element.orderLineItems.forEach(lineitem => erg = erg.concat(`<li>${lineitem.productName} </li>`))
+                erg = erg.concat('</ol>')
+                element.state === "PLACED" ? erg = erg.concat(`<p><button onclick=\"paymentok('${element.orderID}')\">payment received</button></p>`) : erg
+                element.state === "PREPARING_FOR_DELIVERY" ? erg = erg.concat(`<p><button onclick=\"initiateDelivery('${element.orderID}')\">request delivery</button></p>`) : erg
+                erg = erg.concat('<p>----</p>')
+            })
+            
+            erg = erg.concat("</div>")
+            document.getElementById("orders").innerHTML = erg;
+        })
+        .catch(error=>console.log(error))
+    }
+
+    async function putorder()
+    {
+     const resp = await fetch('http://localhost:9999/api/v1/orders',{
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: `{
+                        "customerID": "CUS1d34e56",
+                        "customerFirstname": "Caesar",
+                        "customerLastname": "Franklin",
+                        "customerEmail": "a.b@c.de",
+                        "customerStreet": "Hollywood Boulevard 2",
+                        "customerZipcode" : "3452",
+                        "customerCity" : "LA",
+                        "customerCountry" : "USA",
+                        "cartItems": [
+                            {
+                            "productNumber": "P123RE123D",
+                            "productName" : "MacBook Pro 2022",
+                            "priceNet" : 1000,
+                            "tax" : 20,
+                            "amount": 1
+                            },
+                            {
+                            "productNumber": "O12345RE12",
+                            "productName" : "Ipad Pro 2021",
+                            "priceNet" : 99.99,
+                            "tax" : 10,
+                            "amount": 10
+                            }
+                        ]
+                    }`
+        })
+        const data = await resp.json()
+        alert(`New order with ID ${data.orderID} placed!`)
+        getallorders();
+    }
+
+    async function paymentok(orderid)
+    {
+      await fetch(
+            `http://localhost:9999/api/v1/orders/checkpayment/${orderid}`,{
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        alert("Order payment set. Packing requestet in stock!")
+        getallorders();
+    }
+
+    async function initiateDelivery(orderID)
+    {
+      await fetch(
+            `http://localhost:9999/api/v1/orders/preparedelivery/${orderID}`,{
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        alert("Delivery initalized at delivery service!")
+        getallorders();
+    }
+
+</script>
+
+<body style="font-family:sans-serif" onload="getallorders()">
+    <h1>[erplite] Frontend Prototype - WEBSHOP</h1>
+    <div id="menue">[webshop]---<a href="stock.html">[stock]</a>---<a href="delivery.html">[delivery]</a></div>
+    <h3>Orders</h3>
+    <button onclick="putorder()">Testbestellung aufgeben</button>
+    <div id="orders">
+        <p>... Ausgabe ...</p>
+    </div>
+</body>
+</html>

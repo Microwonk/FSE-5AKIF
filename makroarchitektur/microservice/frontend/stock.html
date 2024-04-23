@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    function getallpackings()
+    {
+      fetch('http://localhost:9999/stock/packings')
+        .then(response => response.json())
+        .then(data => {
+            let erg = "<div>"
+            data.forEach(element => {
+                erg = erg.concat(`<p>Packing id ${element.id} for order #<em>${element.orderId}</em>. Packing items: </p>`)
+                erg = erg.concat('<ul>')
+                    element.packingItemList.forEach(item => {
+                        erg = erg.concat(`<li>[packing item #${item.id} for product ${item.productName}] `)
+                        !item.packed ? erg = erg.concat(`<button onclick=\"setpackedforpackingitem('${item.id}')\">mark packed</button></li>`) : erg = erg.concat(" [packed]</li>")
+                        }
+                    )
+                erg = erg.concat('</ul></li>')
+            })
+            erg = erg.concat("</div>")
+            document.getElementById("packings").innerHTML = erg;
+        })
+        .catch(error=>console.log(error))
+    }
+
+    async function setpackedforpackingitem(packingitemid)
+    {
+       await fetch(
+            `http://localhost:9999/stock/setPackedForPacking/${packingitemid}`,{
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        getallpackings()
+    }
+
+</script>
+
+<body style="font-family:sans-serif" onload="getallpackings()">
+
+    <h1>[erplite] Frontend Prototype - STOCK</h1>
+    <div id="menue"><a href="webshop.html">[webshop]</a>---[stock]---<a href="delivery.html">[delivery]</a></div>
+
+    <h2>Packings</h2>
+    <div id="packings">
+        <p>... Ausgabe ...</p>
+    </div>
+
+</body>
+</html>

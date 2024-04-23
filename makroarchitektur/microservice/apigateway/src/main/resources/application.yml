@@ -1,0 +1,75 @@
+# TODO: API-Gateway für Absicherung der Entdpunkte https://github.com/timtebeek/spring-security-samples/blob/main/spring-cloud-gateway-oidc-tokenrelay/README.adoc
+server:
+  port: 9999
+spring:
+  application:
+    name: apigateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # Verwendung der Service-Discovery für das Ansprechen der Microservices
+          enabled: true
+          # Alle in der Service-Discovery regstrierten Services in Lower-Case ansprechen (Standardmäßig UPPERCASE)
+          lower-case-service-id: true
+      routes:
+        - id: orders
+          # lb bedeutet hier, dass der Load-Balancer für die Ermittlung der eigentlichen Route verwendet wird.
+          # Dieser wiederum fragt an der Service-Registry nach dem korrekten Server und Port (siehe discovery-Zweig)
+          # Eine Anfrage mit dem Pfad /api/v1/orders/** wird an das Service geschickt, das in der Service-Registry
+          # mit dem Namen erpliteorders registriert ist (ServerIP:Port wird ersetzt, Rest wird übernommen).
+          uri: lb://erpliteorders
+          predicates:
+            - Path=/api/v1/orders/**
+          filters:
+            # Falls ein Response-Location header (wie z.B. beim Erstellen einer Ressource über POST-Request) vom Backend-Service im Response-Header zurückkommt,
+            # wird der Server:Port-Teil mit den Serverdaten des API-Gateways überschrieben.
+            - RewriteLocationResponseHeader=AS_IN_REQUEST, Location, ,
+        - id: stock
+          uri: lb://erplitestock
+          predicates:
+            - Path=/stock/**
+        - id: delivery
+          uri: lb://erplitedelivery
+          predicates:
+            - Path=/delivery/**
+      globalcors:
+        #CORS-Konfiguration
+        cors-configurations:
+          '[/**]':
+            # Folgende Server werden als Anfragequelle erlaubt
+            allowedOrigins: "http://127.0.0.1:5500, http://localhost:5500"
+            # Folgende Header in HTTP-Anfragen werden erlaubt
+            allowedHeaders:
+              - Accept
+              # Dieser Header wird für API-POST-Requests benötigt (application/json)
+              - Content-Type
+            # Folgende Methoden in HTTP-Anfragen werden erlaubt
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    #API Gateway holt sich die Daten aus der Service Discovery
+    fetch-registry: true
+    #API registriert sich selbst nicht als Service in der Service Discovery
+    register-with-eureka: false
+  instance:
+    prefer-ip-address: true
+management:
+  # Actuator-Endpoint Konfiguration
+  endpoints:
+    jmx:
+      exposure:
+        include:
+          - health
+          - info
+    web:
+      exposure:
+        include:
+          - health
+          - info

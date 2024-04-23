@@ -1,0 +1,38 @@
+version: "3.2"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+  db:
+    image: mariadb:10.3
+    restart: always
+    container_name: 'mariadb'
+    environment:
+      MARIADB_ROOT_PASSWORD: 'notSecureChangeMe'
+      MARIADB_ROOT_HOST: "%"
+    ports:
+      - 3306:3306
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+  adminer:
+    image: adminer:4.8.0
+    container_name: 'adminer'
+    restart: always
+    ports:
+      - 8091:8080
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: 'phpmyadmin'
+    restart: always
+    ports:
+      - 8090:80
+    environment:
+      - PMA_ARBITRARY=1
+
+
+  

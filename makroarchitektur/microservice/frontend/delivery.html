@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    function getalldeliveries()
+    {
+       fetch('http://localhost:9999/delivery')
+        .then(response => response.json())
+        .then(data => {
+            let erg = "<ol>"
+            data.forEach(element => {
+                erg = erg.concat(`<li>Delivery id ${element.deliveryId} for order #<em>${element.orderID}</em>`)
+                !element.delivered ? erg = erg.concat(`<button onclick=\"setDelivered('${element.orderID}')\">mark delivered</button></li>`) : erg = erg.concat(" [delivered] </li>")    
+            })
+            erg = erg.concat("</ol>")
+            document.getElementById("deliveries").innerHTML = erg;
+        })
+        .catch(error=>console.log(error))
+    }
+
+    async function setDelivered(orderID)
+    {
+     await fetch(
+            `http://localhost:9999/delivery/orderdelivered/${orderID}`,{
+            method:'POST',
+            headers:{
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        getalldeliveries()
+    }
+
+</script>
+
+<body style="font-family:sans-serif" onload="getalldeliveries()">
+    <h1>[erplite] Frontend Prototype - DELIVERY</h1>
+    <div id="menue"><a href="webshop.html">[webshop]</a>---<a href="stock.html">[stock]</a>---[delivery]</div>
+
+    <h2>Registered deliveries</h2>
+
+    <div id="deliveries">
+        <p>... Ausgabe ...</p>
+    </div>
+
+</body>
+</html>
