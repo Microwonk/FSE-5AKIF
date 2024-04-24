@@ -61,3 +61,49 @@ Die wesentlichen Bausteine des modellgetriebenen Entwurfs (Taktische Pattern) au
 - **Module**: Organisatorische Einheiten, die zusammengehörige Teile des Domänenwissens kapseln und voneinander isolieren.
 
 - **Event**: Ereignisse, die relevante Änderungen im System beschreiben und für die Synchronisation zwischen verschiedenen Teilen des Systems verwendet werden können.
+
+# B) Architekturanalyse
+
+## Modulith UML
+
+![Modulith](modulith.png "Modulith")
+
+## Modulith Spring dependency
+
+![Modulith Spring](modulith_spring.png "Modulith Spring")
+
+![](swaggerui.png)
+
+# C) Modulith
+
+Generiert mittels spring-modulith-docs, dann in mermaid konvertiert
+
+```mermaid
+graph TD
+subgraph ErpliteApplication["ErpliteApplication"]
+    style ErpliteApplication.Container fill:#f9f,stroke:#333,stroke-width:2px,opacity:0.9
+    style ErpliteApplication.Component fill:#fff,stroke:#333,stroke-width:2px,opacity:0.9
+    subgraph ErpliteApplication_boundary["ErpliteApplication_boundary"]
+        style ErpliteApplication.Container fill:#f9f,stroke:#333,stroke-width:2px,opacity:0.9
+        style ErpliteApplication.Component fill:#fff,stroke:#333,stroke-width:2px,opacity:0.9
+        Sharedkernel["Sharedkernel"]
+        Ordermanagement["Ordermanagement"]
+        Stockmanagement["Stockmanagement"]
+        Customermanagement["Customermanagement"]
+    end
+end
+
+Sharedkernel -->|depends on| Stockmanagement
+Ordermanagement -->|depends on| Sharedkernel
+Ordermanagement -->|depends on| Customermanagement
+Customermanagement -->|depends on| Sharedkernel
+Customermanagement -->|depends on| Ordermanagement
+```
+
+Direkt von PUML
+![](puml1.png)
+![](puml2.png)
+![](puml3.png)
+![](puml4.png)
+
+Die Library kann bei dem Testen und Erkennen von Zyklischen dependencies und genereller Analyse helfen.
