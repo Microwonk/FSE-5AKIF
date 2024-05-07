@@ -27,7 +27,7 @@ services:
       - 8091:8080
   phpmyadmin:
     image: phpmyadmin
-    container_name: 'phpmyadmin'
+    container_name: 'erp_phpmyadmin'
     restart: always
     ports:
       - 8090:80

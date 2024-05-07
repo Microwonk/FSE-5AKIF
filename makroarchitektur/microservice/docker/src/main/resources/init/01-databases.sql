@@ -1,0 +1,11 @@
+# create databases ;
+CREATE DATABASE IF NOT EXISTS `ordermgmt`;
+CREATE DATABASE IF NOT EXISTS `stockmgmt`;
+CREATE DATABASE IF NOT EXISTS `deliverymgmt`;
+CREATE USER IF NOT EXISTS 'orderuser'@'%' IDENTIFIED BY 'newpassorder';
+CREATE USER IF NOT EXISTS 'stockuser'@'%' IDENTIFIED BY 'newpassstock';
+CREATE USER IF NOT EXISTS 'deliveryuser'@'%' IDENTIFIED BY 'newpassdelivery';
+GRANT ALL PRIVILEGES ON *.* TO `root`@`%`;
+GRANT ALL PRIVILEGES ON `ordermgmt`.* TO `orderuser`@`%`;
+GRANT ALL PRIVILEGES ON `stockmgmt`.* TO `stockuser`@`%`;
+GRANT ALL PRIVILEGES ON `deliverymgmt`.* TO `deliveryuser`@`%`;

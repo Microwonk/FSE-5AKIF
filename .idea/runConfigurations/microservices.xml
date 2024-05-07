@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="microservices" type="CompoundRunConfigurationType">
+    <toRun name="ApiGateway" type="SpringBootApplicationConfigurationType" />
+    <toRun name="DeliverMS" type="SpringBootApplicationConfigurationType" />
+    <toRun name="OrdersMS" type="SpringBootApplicationConfigurationType" />
+    <toRun name="ServiceDiscovery" type="SpringBootApplicationConfigurationType" />
+    <toRun name="StockMS" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

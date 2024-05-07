@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: net.microwonk.aufg_interfaces_und_abstrakte_klassen.Main
+net.microwonk.Main-Class: net.microwonk.aufg_interfaces_und_abstrakte_klassen.net.microwonk.Main
 

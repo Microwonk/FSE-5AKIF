@@ -18,6 +18,7 @@
         <module>orders</module>
         <module>erpliteservicedisc</module>
         <module>erplistestock</module>
+        <module>docker</module>
     </modules>
 
     <properties>
