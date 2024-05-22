@@ -72,7 +72,7 @@ Die wesentlichen Bausteine des modellgetriebenen Entwurfs (Taktische Pattern) au
 
 ![Modulith Spring](modulith_spring.png "Modulith Spring")
 
-![](swaggerui.png)
+<!-- ![](swaggerui.png) -->
 
 # C) Modulith
 
@@ -107,3 +107,193 @@ Direkt von PUML
 ![](puml4.png)
 
 Die Library kann bei dem Testen und Erkennen von Zyklischen dependencies und genereller Analyse helfen.
+
+# Microservices
+
+## Projektaufbau
+Dieses Projekt besteht aus 5 MicroServices, die komplett eigenständig sind.
+Dockerfiles für die Erstellung der notwendigen Container sind im Dockerfile Ordner.
+![img_11.png](img_11.png)
+![img_10.png](img_10.png)
+
+
+## RabbitMQ
+RabbitMQ ist eine Messaging-Software, die das Nachrichtenvermittlungsprotokoll AMQP (Advanced Message Queuing Protocol) implementiert.
+Die Queue enthällt dabei beispielsweise eine Id und Prioritäten und gibt so die Meldungen weiter.
+RabbitMQ dient der Kommunikation zwischen verschiedenen Teilen einer Anwendung oder zwischen verschiedenen Anwendungen.
+
+![img_5.png](img_5.png)
+
+Hier ein Beispiel für incoming and outgoing Messages im Ordermanagement.
+Gezeigt im Code ist die Rabbit Klasse.
+```java
+package at.kolleg.erplite.ordermanagement.messaging.rabbitmq;
+
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitMQConfig {
+
+    //https://www.rabbitmq.com/tutorials/tutorial-one-spring-amqp.html
+    //https://springhow.com/spring-boot-rabbitmq/
+
+    @Bean
+    public Declarables createPostRegistrationSchema() {
+        return new Declarables(
+               new FanoutExchange("x.erplitefanout"),
+                new TopicExchange("x.erplitetopic"),
+               new Queue("q.orderpacked2"),
+                new Queue("q.order_paymentchecked"),
+                new Queue("q.order_placed"),
+                new Queue("q.initiate_delivery"),
+                new Queue("q.order_in_delivery"),
+                new Queue("q.order_delivered"),
+                new Binding("q.order_paymentchecked", Binding.DestinationType.QUEUE, "x.erplitetopic", "q.order_paymentchecked", null),
+                new Binding("q.order_placed", Binding.DestinationType.QUEUE, "x.erplitetopic", "q.order_placed", null),
+                new Binding("q.initiate_delivery", Binding.DestinationType.QUEUE, "x.erplitetopic", "q.initiate_delivery", null),
+                new Binding("q.order_in_delivery", Binding.DestinationType.QUEUE, "x.erplitetopic", "q.order_in_delivery", null),
+                new Binding("q.orderpacked2", Binding.DestinationType.QUEUE, "x.erplitefanout", "q.orderpacked2", null),
+                new Binding("q.order_delivered", Binding.DestinationType.QUEUE, "x.erplitetopic", "q.order_delivered", null));
+    }
+
+    @Bean
+    public OrderIncomingRabbitMessageRelay receiver() {
+        return new OrderIncomingRabbitMessageRelay();
+    }
+
+    @Bean
+    MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+}
+
+```
+
+```java
+package at.kolleg.erplite.ordermanagement.messaging.rabbitmq;
+
+import at.kolleg.erplite.ordermanagement.marker.AdapterMarker;
+import at.kolleg.erplite.ordermanagement.ports.out.OrderOutgoingMessageRelay;
+import at.kolleg.erplite.sharedkernel.events.OrderInitiateDeliveryEvent;
+import at.kolleg.erplite.sharedkernel.events.OrderPaymentValidatedEvent;
+import at.kolleg.erplite.sharedkernel.events.OrderPlacedEvent;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@Service
+class OrderOutgoingRabbitMessageRelayImpl implements OrderOutgoingMessageRelay {
+
+    @Autowired
+    private RabbitTemplate template;
+
+    /*
+    @Qualifier("orderPlaced")
+    @Autowired
+    private Queue orderPlacedQueue;
+
+    @Qualifier("orderPaymentCheck")
+    @Autowired
+    private Queue orderPaymentCheckQueue;*/
+
+    @Override
+    public void publish(final OrderPlacedEvent orderPlacedEvent) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Publishing order placed RabbitMQ event for order# " + orderPlacedEvent.orderResponse().orderID());
+        this.template.convertAndSend("q.order_placed", orderPlacedEvent);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Order placed event for order# " + orderPlacedEvent.orderResponse().orderID() + " published!");
+
+    }
+
+    @Override
+    public void publish(final OrderPaymentValidatedEvent orderPaymentValidatedEvent) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Publishing order payment validated RabbitMQ event");
+        this.template.convertAndSend("q.order_paymentchecked", orderPaymentValidatedEvent);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Order payment validated event published!");
+    }
+
+    @Override
+    public void publish(final OrderInitiateDeliveryEvent orderInitiateDeliveryEvent) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Publishing orderInitiateDelivery RabbitMQ event!");
+        this.template.convertAndSend("q.initiate_delivery", orderInitiateDeliveryEvent);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "OrderInitiateDelivery event published!");
+    }
+}
+
+```
+
+```java
+package org.springframework.amqp.rabbit.annotation;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@MessageMapping
+@Documented
+@Repeatable(RabbitListeners.class)
+public @interface RabbitListener {
+    String id() default "";
+
+    String containerFactory() default "";
+
+    String[] queues() default {};
+
+    Queue[] queuesToDeclare() default {};
+
+    boolean exclusive() default false;
+
+    String priority() default "";
+
+    String admin() default "";
+
+    QueueBinding[] bindings() default {};
+
+    String group() default "";
+
+    String returnExceptions() default "";
+
+    String errorHandler() default "";
+
+    String concurrency() default "";
+
+    String autoStartup() default "";
+
+    String executor() default "";
+
+    String ackMode() default "";
+
+    String replyPostProcessor() default "";
+
+    String messageConverter() default "";
+
+    String replyContentType() default "";
+
+    String converterWinsContentType() default "true";
+}
+
+```
+## Frontend und Datenbank
+Hier sind die Frontendeingaben und die Datenbankeinträge mit Screenshots dokumentiert.
+![img.png](img.png)
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
+![img_6.png](img_6.png)
+![img_7.png](img_7.png)
+![img_9.png](img_9.png)
+![img_8.png](img_8.png)
+
