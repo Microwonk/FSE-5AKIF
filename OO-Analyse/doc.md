@@ -252,7 +252,8 @@ aufgeteilt in Gross und Klein, kann gezeichnet werden
 
 ### Sequenzdiagramm 1
 
-TODO
+![alt text](image-4.png)
+Ein Sequenzdiagramm zu Beschreibung mehrer ajax Aufrufe, die auf weitergehende Services zugreifen, wie DWRServlet/Service... Es gibt auch einen optionalen Teil, welcher Fehler behandeln soll.
 
 ### Sequenzdiagramm 2
 
@@ -278,7 +279,8 @@ end
 
 ### Aktivitätsdiagramm 1
 
-TODO
+![alt text](image-5.png)
+Beschreibt eine einfache Aktivität, was einen Commuter, Ticket vm, und eine Bank als Akteure hat. Durch Informationsaustausch kommuniziert der Commuter mit der TVM um ein Ticket zu bestellen und zu bezahlen, die Bezahlung geht dann weiter an die Bank(ohne cash), zu TVM und dann zum Commuter.
 
 ### Aktivitätsdiagramm 2
 
@@ -306,7 +308,8 @@ stop
 
 ### Zustandsdiagramm 1
 
-TODO
+![alt text](image-6.png)
+Beschreibt den Zustand einer ATM, Idle, Maintenance und OOS. Kunden interaktion im Service Customer, bishin zum Final State.
 
 ### Zustandsdiagramm 2
 
